@@ -1,0 +1,83 @@
+#!/bin/sh
+# x.PreProc_SEG-anat
+
+# Performs tissue segmentationo on a brain extracted anatomically weighted 3D dataset (i.e. T1)
+# Tissue segmentation is done with FSL-FAST into 3 classes (GM, WM and CSF)
+# and binarized masks are outputted.
+
+if [ $# -ne 3 ]
+then
+    echo "****************************************************************************************************"
+    echo "Insufficient arguments supplied"
+    echo "Input 1 should be the full path to the anatomically weighted file (no file extension - assumes NIFTI)"
+    echo "Input 2 should be the full path to the output directory"
+    echo "Input 3 should be the partial volume threshold for the tissue masks"
+    echo "****************************************************************************************************"
+    exit
+fi
+
+#define inputs
+input_file=${1}
+output_dir=${2}
+pv_thr=${3}
+
+#Check the input file exists
+echo "****************************"
+echo "Input file is ${input_file}"
+echo "****************************"
+if [ ! -f "${input_file}.nii.gz" ]
+then
+  echo "*************************************************"
+  echo "Cannot locate the NIFTI input file ${input_file}"
+  echo "...exiting!"
+  echo "*************************************************"
+  exit
+fi
+
+#If output directory is not present, make it
+if [ ! -d ${output_dir} ]
+then
+  mkdir ${output_dir}
+fi
+echo "*********************************"
+echo "Output directory is ${output_dir}"
+echo "*********************************"
+
+#Get the input filename without the path
+anat_prefix="$(basename -- $input_file)"
+
+#Run FAST segmentation
+if [ ! -f ${output_dir}/${anat_prefix}_pve_1.nii.gz ]
+then
+
+  echo "***********************************************"
+  echo "Running FSL-FAST segmentation on ${anat_prefix}"
+  echo "***********************************************"
+
+  fast ${output_dir}/${anat_prefix}.nii.gz
+else
+  echo "***********************************************"
+  echo "FAST segmentation of ${anat_prefix} already run"
+  echo "***********************************************"
+fi
+
+###########
+# GM mask #
+###########
+
+if [ ! -f "${output_dir}/${anat_prefix}_CSFmask_${pv_thr}.nii.gz" ]
+then
+
+  echo "**********************************************************"
+  echo "Making GM, WM and CSF masks based on partial volume images"
+  echo "**********************************************************"
+
+  fslmaths "${output_dir}/${anat_prefix}_pve_1.nii.gz" -thr ${pv_thr} -bin "${output_dir}/${anat_prefix}_GMmask_${pv_thr}.nii.gz"
+  fslmaths "${output_dir}/${anat_prefix}_pve_2.nii.gz" -thr ${pv_thr} -bin "${output_dir}/${anat_prefix}_WMmask_${pv_thr}.nii.gz"
+  fslmaths "${output_dir}/${anat_prefix}_pve_0.nii.gz" -thr ${pv_thr} -bin "${output_dir}/${anat_prefix}_CSFmask_${pv_thr}.nii.gz"
+
+else
+  echo "*********************************"
+  echo "GM, WM and CSF masks already made"
+  echo "*********************************"
+fi

@@ -1,0 +1,70 @@
+#!/bin/sh
+# x.PreProc_MEANTS-4D
+
+# Outputs a mean time-series within a mask
+
+if [ $# -ne 4 ]
+then
+    echo "********************************************************************************************************"
+    echo "Insufficient arguments supplied"
+    echo "Input 1 should be the full path to the input scan*"
+    echo "Input 2 should be the full path to the mask*"
+    echo "Input 3 should be the mask name e.g. WholeBrain, GM, V1"
+    echo "Input 4 should be the full path to the output directory"
+    echo "*Note: do not include file extension - assumes nii.gz"
+    echo "********************************************************************************************************"
+    exit
+fi
+
+#define inputs
+input_file=${1}
+mask_file=${2}
+mask_name=${3}
+output_dir=${4}
+
+#Check the input files exist
+echo "*******************************************************"
+echo "Input files are ${input_file} and ${mask_file}"
+echo "*******************************************************"
+if [ ! -f "${input_file}.nii.gz" ]
+then
+  echo "***************************************************"
+  echo "Cannot locate the NIFTI input file ${input_file}"
+  echo "...exiting!"
+  echo "***************************************************"
+  exit
+fi
+
+if [ ! -f "${mask_file}.nii.gz" ]
+then
+  echo "***************************************************"
+  echo "Cannot locate the NIFTI input file ${mask_file}"
+  echo "...exiting!"
+  echo "***************************************************"
+  exit
+fi
+
+#If output directory is not present, make it
+if [ ! -d ${output_dir} ]
+then
+  mkdir ${output_dir}
+fi
+echo "********************************"
+echo "Output directory is ${output_dir}"
+echo "********************************"
+
+#Get the input filename without the path
+input_prefix="$(basename -- $input_file)"
+
+#Save mean functional time series over the mask
+if [ ! -f ${output_dir}/${input_prefix}_${mask_name}_MeanTS.txt ]
+then
+  echo "*********************************************************************"
+  echo "Saving a mean time series from ${input_prefix} in ${mask_name} voxels"
+  echo "*********************************************************************"
+  fslmeants -i ${input_file}.nii.gz -o ${output_dir}/${input_prefix}_${mask_name}_MeanTS.txt -m ${mask_file}.nii.gz
+else
+ echo "*******************************************************************"
+ echo "Mean time series from ${input_prefix} in ${mask_name} already made"
+ echo "*******************************************************************"
+fi

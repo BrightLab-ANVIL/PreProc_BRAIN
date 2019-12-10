@@ -1,0 +1,66 @@
+#!/bin/sh
+# x.PreProc_BET-4D
+
+# Runs brain extraction on a 4D dataset (e.g. motion corrected functional image)
+
+if [ $# -ne 2 ]
+then
+  echo "*****************************************************************************************************"
+  echo "Insufficient arguments supplied"
+  echo "Input 1 should be the full path to the 4D input scan (do not include file extension - assumes nii.gz)"
+  echo "Input 2 should be the full path to the output directory"
+  echo "*****************************************************************************************************"
+  exit
+fi
+
+#define inputs
+input_file=${1}
+output_dir=${2}
+
+#Check the input file exists
+echo "***************************"
+echo "Input file is ${input_file}"
+echo "***************************"
+if [ ! -f "${input_file}.nii.gz" ]
+then
+  echo "************************************************"
+  echo "Cannot locate the NIFTI input file ${input_file}"
+  echo "...exiting!"
+  echo "************************************************"
+  exit
+fi
+
+#If output directory is not present, make it
+if [ ! -d ${output_dir} ]
+then
+  mkdir ${output_dir}
+fi
+echo "********************************"
+echo "Output directory is ${output_dir}"
+echo "********************************"
+
+#Get the input filename without the path
+input_prefix="$(basename -- $input_file)"
+
+# Run brain extraction
+
+if [ ! -f "${output_dir}/${input_prefix}_bet.nii.gz" ]
+then
+
+  echo "**************************************************"
+  echo "Running brain extraction on ${input_prefix}.nii.gz"
+  echo "**************************************************"
+  bet "${input_file}.nii.gz" "${output_dir}/${input_prefix}_bet.nii.gz" -m -F
+
+  #erode edges for a more conservative brain mask
+  echo "**************************************************"
+  echo "Eroding edges from ${input_prefix}_bet.nii.gz"
+  echo "**************************************************"
+  fslmaths "${output_dir}/${input_prefix}_bet.nii.gz" -ero "${output_dir}/${input_prefix}_bet_ero.nii.gz"
+  fslmaths "${output_dir}/${input_prefix}_bet.nii.gz" -bin "${output_dir}/${input_prefix}_bet_ero_mask.nii.gz"
+
+else
+  echo "**********************************************************"
+  echo "Brain extraction on ${input_prefix}.nii.gz already complete"
+  echo "**********************************************************"
+fi

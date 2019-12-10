@@ -1,0 +1,86 @@
+#!/bin/sh
+# x.PreProc_VolReg-4D
+
+# Uses 3dvolreg to register a 4D image to a reference image and saves motion parameters
+
+if [ $# -ne 4 ]
+then
+    echo "**************************************************************************************"
+    echo "Insufficient arguments supplied"
+    echo "Input 1 should be the full path to the 4D input scan*"
+    echo "Input 2 should be the full path to reference scan* (this can be the same as input 1)"
+    echo "Input 3 should be the volume number of reference scan"
+    echo "Input 4 should be the full path to the output directory"
+    echo "*Do not include file extension - assumes nii.gz"
+    echo "**************************************************************************************"
+    exit
+fi
+
+#define inputs
+input_file=${1}
+ref_file=${2}
+ref_vol=${3}
+output_dir=${4}
+
+#Check the input file exists
+echo "***************************"
+echo "Input file is ${input_file}"
+echo "***************************"
+if [ ! -f "${input_file}.nii.gz" ]
+then
+  echo "************************************************"
+  echo "Cannot locate the NIFTI input file ${input_file}"
+  echo "...exiting!"
+  echo "************************************************"
+  exit
+fi
+
+#If output directory is not present, make it
+if [ ! -d ${output_dir} ]
+then
+  mkdir ${output_dir}
+fi
+echo "********************************"
+echo "Output directory is ${output_dir}"
+echo "********************************"
+
+#Get the input filename without the path
+input_prefix="$(basename -- $input_file)"
+
+#Create a symbolic link of the original dataset in the output directory
+if [ ! -f "${output_dir}/${input_prefix}_ORIG.nii.gz" ]
+then
+  ln -s "${input_file}.nii.gz" "${output_dir}/${input_prefix}_ORIG.nii.gz"
+fi
+
+# Volume Registration
+
+if [ ! -f ${output_dir}/${input_prefix}_mc.nii.gz ]
+then
+  echo "****************************************************"
+  echo "Running volume registration on ${input_prefix}.nii.gz"
+  echo "****************************************************"
+
+  #Run volume registration (AFNI)
+  3dvolreg -dfile ${output_dir}/${input_prefix}_mc.1D \
+  -base ${ref_file}.nii.gz[${ref_vol}] \
+  -maxdisp1D ${output_dir}/${input_prefix}_mc_maxdisp.1D \
+  -prefix ${output_dir}/${input_prefix}_mc.nii.gz \
+  ${input_file}.nii.gz
+
+  #Demean the saved motion parameters
+  # 0: roll; 1: pitch; 2: yaw; 3: dS (z); 4: dL (x); 5: dP (y)
+  if [ ! -f ${output_dir}/${input_prefix}_mc_demean.1D ]
+  then
+    echo "*******************************************"
+    echo "Demeaning and saving the motion parameters!"
+    echo "*******************************************"
+    1d_tool.py -infile ${output_dir}/${input_prefix}_mc.1D[1..6] \
+    -demean -write ${output_dir}/${input_prefix}_mc_demean.1D
+  fi
+
+else
+  echo "**************************************************************"
+  echo "Volume registration already complete for ${input_prefix}.nii.gz"
+  echo "**************************************************************"
+fi

@@ -1,0 +1,66 @@
+#!/bin/sh
+# x.PreProc_BET-anat
+
+# Performs brain extraction on an anatomically weighted 3D dataset (i.e T1-w)
+# Check the output before proceeding to later analysis steps (e.g. x.PreProc_SEG-anat and x.PreProc_TissueReg)
+# If the brain extraction is poor, re-run BET with different inputs
+
+if [ $# -ne 2 ]
+then
+    echo "**************************************************************************************"
+    echo "Insufficient arguments supplied"
+    echo "Input 1 should be the full path to the T1 input file (no file extension - assumes nii.gz)"
+    echo "Input 2 should be the full path to the output directory"
+    echo "**************************************************************************************"
+    exit
+fi
+
+#define inputs
+input_file=${1}
+output_dir=${2}
+
+#Check the input file exists
+echo "****************************"
+echo "Input file is ${input_file}"
+echo "****************************"
+if [ ! -f "${input_file}.nii.gz" ]
+then
+  echo "*************************************************"
+  echo "Cannot locate the NIFTI input file ${input_file}"
+  echo "...exiting!"
+  echo "*************************************************"
+  exit
+fi
+
+#If output directory is not present, make it
+if [ ! -d ${output_dir} ]
+then
+  mkdir ${output_dir}
+fi
+echo "*********************************"
+echo "Output directory is ${output_dir}"
+echo "*********************************"
+
+#Get the input filename without the path
+anat_prefix="$(basename -- $input_file)"
+
+#Create a symbolic link of the original dataset in the output directory
+if [ ! -f "${output_dir}/${anat_prefix}_ORIG.nii.gz" ]
+then
+  ln -s "${input_file}.nii.gz" "${output_dir}/${anat_prefix}_ORIG.nii.gz"
+fi
+
+#Run brain extraction on the T1 dataset
+if [ ! -f ${output_dir}/${anat_prefix}_bet.nii.gz ]
+then
+
+  echo "**********************************************"
+  echo "Running brain extraction on the ${anat_prefix}"
+  echo "**********************************************"
+  bet "${input_file}.nii.gz" ${output_dir}/${anat_prefix}_bet -m
+
+else
+  echo "***************************************************"
+  echo "Brain extraction of ${anat_prefix} already complete"
+  echo "***************************************************"
+fi

@@ -1,0 +1,64 @@
+#!/bin/sh
+# x.PreProc_Mask-4D
+
+# Applies a mask to an image
+# This is useful if you want to run BET on one image and apply the brain mask to other images.
+
+if [ $# -ne 3 ]
+then
+  echo "*****************************************************************************************************"
+  echo "Insufficient arguments supplied"
+  echo "Input 1 should be the full path to the input scan to be masked*"
+  echo "Input 2 should be the full path to the mask*"
+  echo "Input 3 should be the full path to the output directory"
+  echo "*Note: do not include file extension - assumes nii.gz"
+  echo "*****************************************************************************************************"
+  exit
+fi
+
+#define inputs
+input_file=${1}
+mask_file=${2}
+output_dir=${3}
+
+#Check the input file exists
+echo "***************************"
+echo "Input file is ${input_file}"
+echo "***************************"
+if [ ! -f "${input_file}.nii.gz" ]
+then
+  echo "************************************************"
+  echo "Cannot locate the NIFTI input file ${input_file}"
+  echo "...exiting!"
+  echo "************************************************"
+  exit
+fi
+
+#If output directory is not present, make it
+if [ ! -d ${output_dir} ]
+then
+  mkdir ${output_dir}
+fi
+echo "********************************"
+echo "Output directory is ${output_dir}"
+echo "********************************"
+
+#Get the input filename without the path
+input_prefix="$(basename -- $input_file)"
+
+# Apply mask
+
+if [ ! -f "${output_dir}/${input_prefix}_brain.nii.gz" ]
+then
+  echo "*************************************"
+  echo "Appling mask to ${input_prefix}.nii.gz"
+  echo "*************************************"
+
+  3dcalc -a ${input_file}.nii.gz -b ${mask_file}.nii.gz \
+  -expr "a*b" -prefix ${output_dir}/${input_prefix}_brain.nii.gz
+
+else
+  echo "****************************************"
+  echo "${input_prefix}_brain.nii.gz already made"
+  echo "****************************************"
+fi
