@@ -11,4 +11,7 @@ Suggested order to run:
 5. x.PreProc_SEG-anat (tissue segmentation on anatomical dataset)
 6. x.PreProc_TissueReg (register functional and anatomical datasets)
 7. x.PreProc_Transform (transform anatomical to functional space, or vice versa)
+
+IMPORTANT: If you transform a mask (zeroes and ones) with x.PreProc_Transform, the mask in the new space will no longer be binary. It needs to be thresholded and binarized again. This is explained in [this issue](https://github.com/BrightLab-ANVIL/PreProc_BRAIN/issues/9)
+
 8. x.PreProc_MEANTS (output a mean time-series from the functional dataset, masked by some anatomy)
