@@ -57,7 +57,7 @@ then
   echo "**********************************************"
   echo "Running brain extraction on the ${anat_prefix}"
   echo "**********************************************"
-  bet "${input_file}.nii.gz" ${output_dir}/${anat_prefix}_bet -m
+  bet "${input_file}.nii.gz" ${output_dir}/${anat_prefix}_bet -m  -R
 
 else
   echo "***************************************************"
