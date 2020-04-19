@@ -2,8 +2,8 @@
 # x.PreProc_VolReg-4D
 
 # Uses 3dvolreg to register a 4D image to a reference image and saves motion parameters
-
-if [ $# -ne 4 ]
+#
+if [ $# -ne 5 ]
 then
     echo "**************************************************************************************"
     echo "Insufficient arguments supplied"
@@ -12,6 +12,7 @@ then
     echo "Input 3 should be the volume number of reference scan"
     echo "Input 4 should be the full path to the output directory"
     echo "*Do not include file extension - assumes nii.gz"
+    echo "Input 5 should be 'y' or 'n' to output derivative and quadratic regressors"
     echo "**************************************************************************************"
     exit
 fi
@@ -21,6 +22,15 @@ input_file=${1}
 ref_file=${2}
 ref_vol=${3}
 output_dir=${4}
+quad_deriv=${5}
+
+#Check input 5 to output derivative and quadratic
+if [ ${quad_deriv} != y ] && [ ${quad_deriv} != n ]; then
+  echo "*****************************"
+  echo "Input 5 is unknown... exiting"
+  echo "*****************************"
+  exit
+fi
 
 #Check the input file exists
 echo "***************************"
@@ -77,6 +87,29 @@ then
     echo "*******************************************"
     1d_tool.py -infile ${output_dir}/${input_prefix}_mc.1D[1..6] \
     -demean -write ${output_dir}/${input_prefix}_mc_demean.1D
+  fi
+
+  # Calculate the quadratic and derivative parameters if requested
+  if [ ${quad_deriv} = y ]; then
+    echo "*************************************************"
+    echo "Making derivative and quadratic motion regressors"
+    echo "*************************************************"
+    # Output temporal derivatives of motion regressor
+    1d_tool.py -infile ${output_dir}/${input_prefix}_mc.1D[1..6] \
+    -derivative -write ${output_dir}/${input_prefix}_mc_deriv.1D
+    # Output quadratics (squared) of motion regressor
+    1dcat `1deval -1D: -a ${output_dir}/${input_prefix}_mc.1D[1] -expr 'a*a'` \
+    `1deval -1D: -a ${output_dir}/${input_prefix}_mc.1D[2] -expr 'a*a'` \
+    `1deval -1D: -a ${output_dir}/${input_prefix}_mc.1D[3] -expr 'a*a'` \
+    `1deval -1D: -a ${output_dir}/${input_prefix}_mc.1D[4] -expr 'a*a'` \
+    `1deval -1D: -a ${output_dir}/${input_prefix}_mc.1D[5] -expr 'a*a'` \
+    `1deval -1D: -a ${output_dir}/${input_prefix}_mc.1D[6] -expr 'a*a'` > ${output_dir}/${input_prefix}_mc_quad.1D
+    # Demean the derivative and quadratic motion regressor *************** check 1dtool documentation for what infile
+    # should be do I need a file that I can say [1..6]???
+    1d_tool.py -infile ${output_dir}/${input_prefix}_mc_deriv.1D \
+    -demean -write ${output_dir}/${input_prefix}_mc_deriv_demean.1D
+    1d_tool.py -infile ${output_dir}/${input_prefix}_mc_quad.1D \
+    -demean -write ${output_dir}/${input_prefix}_mc_quad_demean.1D
   fi
 
 else
