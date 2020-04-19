@@ -2,7 +2,7 @@
 # x.PreProc_VolReg-4D
 
 # Uses 3dvolreg to register a 4D image to a reference image and saves motion parameters
-#
+
 if [ $# -ne 5 ]
 then
     echo "**************************************************************************************"
@@ -104,8 +104,7 @@ then
     `1deval -1D: -a ${output_dir}/${input_prefix}_mc.1D[4] -expr 'a*a'` \
     `1deval -1D: -a ${output_dir}/${input_prefix}_mc.1D[5] -expr 'a*a'` \
     `1deval -1D: -a ${output_dir}/${input_prefix}_mc.1D[6] -expr 'a*a'` > ${output_dir}/${input_prefix}_mc_quad.1D
-    # Demean the derivative and quadratic motion regressor *************** check 1dtool documentation for what infile
-    # should be do I need a file that I can say [1..6]???
+    # Demean the derivative and quadratic motion regressor
     1d_tool.py -infile ${output_dir}/${input_prefix}_mc_deriv.1D \
     -demean -write ${output_dir}/${input_prefix}_mc_deriv_demean.1D
     1d_tool.py -infile ${output_dir}/${input_prefix}_mc_quad.1D \
