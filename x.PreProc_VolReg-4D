@@ -11,8 +11,8 @@ then
     echo "Input 2 should be the full path to reference scan* (this can be the same as input 1)"
     echo "Input 3 should be the volume number of reference scan"
     echo "Input 4 should be the full path to the output directory"
+    echo "Input 5 should be 'y' or 'n' to output motion derivatives and quadratic terms"
     echo "*Do not include file extension - assumes nii.gz"
-    echo "Input 5 should be 'y' or 'n' to output derivative and quadratic regressors"
     echo "**************************************************************************************"
     exit
 fi
@@ -24,7 +24,7 @@ ref_vol=${3}
 output_dir=${4}
 quad_deriv=${5}
 
-#Check input 5 to output derivative and quadratic
+#Check input 5 to output motion derivatives and quadratic terms
 if [ ${quad_deriv} != y ] && [ ${quad_deriv} != n ]; then
   echo "*****************************"
   echo "Input 5 is unknown... exiting"
@@ -89,7 +89,7 @@ then
     -demean -write ${output_dir}/${input_prefix}_mc_demean.1D
   fi
 
-  # Calculate the quadratic and derivative parameters if requested
+  #Calculate the motion derivatives and quadratic terms, if requested
   if [ ${quad_deriv} = y ]; then
     echo "*************************************************"
     echo "Making derivative and quadratic motion regressors"
