@@ -8,7 +8,7 @@ Suggested order to run:
 
 1. First run the command 'fsl_anat' to process your T1-weighted anatomical image. The simplest way to do this is to type this into your terminal:
 
-fsl_anat -i <structural image> -o <output directory path>
+fsl_anat -i _structural-image_ -o _output-directory-path_
 
 Your <structural image> should be your T1-weighted image that has NOT been brain extracted.
 Running the command as above will runs with all the defaults settings and give you ALL the outputs.
