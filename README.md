@@ -10,7 +10,7 @@ Suggested order to run:
 
 fsl_anat -i _structural-image_ -o _output-directory-path_
 
-Your <structural image> should be your T1-weighted image that has NOT been brain extracted.
+Your structural image should be your T1-weighted image that has NOT been brain extracted.
 Running the command as above will runs with all the defaults settings and give you ALL the outputs.
 Many of the outputs are useful so if you don't have space limitations you might as well generate them all.  
 See here for details: https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/fsl_anat
