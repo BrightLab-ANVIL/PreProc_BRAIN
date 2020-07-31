@@ -2,7 +2,8 @@
 # x.PreProc_TissueReg
 
 # Registers an anatomically weighted image (i.e T1) to a 4D image
-# Both images should be brain extracted (assumes you've run BET-4D, BET-anat)
+# Both images should be brain extracted
+# Linear, 6 dof
 
 if [ $# -ne 4 ]
 then

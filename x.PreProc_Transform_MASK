@@ -1,17 +1,19 @@
 #!/bin/sh
 # x.PreProc_Transform
 
-#Transforms from one image space to another e.g. from T1 to functional space, or GM-mask to functional space
+#Transforms the tissue masks from T1-space to functional space (linear, 6 dof)
 
-if [ $# -ne 5 ]
+if [ $# -ne 6 ]
 then
     echo "********************************************************************************************************"
     echo "Insufficient arguments supplied"
-    echo "Input 1 should be the full path to the input scan* "
-    echo "Input 2 should be the full path to ref scan* "
+    echo "Input 1 should be the full path to the input mask in T1 space* "
+    echo "Input 2 should be the full path to ref scan in fMRI space* "
     echo "Input 3 should be the full path to the transformation matrix*"
-    echo "Input 4 should be the full path the output directory"
-    echo "Input 5 should be output label e.g. lowres or T1toFunc"
+    echo "Input 4 should be the mask threshold (0.5 is suggested)."
+    echo "See here for details: https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FLIRT/FAQ#How_do_I_transform_a_mask_with_FLIRT_from_one_space_to_another.3F"
+    echo "Input 5 should be the full path the output directory"
+    echo "Input 6 should be output label e.g. lowres or fMRIspace or T1toFunc"
     echo "*Note: do not include file extension - assumes nii.gz and .mat"
     echo "********************************************************************************************************"
     exit
@@ -21,8 +23,9 @@ fi
 input_file=${1}
 input_file_ref=${2}
 matrix=${3}
-output_dir=${4}
-output_prefix=${5}
+mask_thresh=${4}
+output_dir=${5}
+output_prefix=${6}
 
 #Check the input files exist
 echo "*******************************************************"
@@ -69,13 +72,18 @@ input_file_prefix="$(basename -- $input_file)"
 mat_file_prefix="$(basename -- $matrix)"
 
 #Transformation
-
 if [ ! -f "${output_dir}/${input_file_prefix}_${output_prefix}.nii.gz" ]
 then
   echo "*****************************************************"
   echo "Transforming ${input_file} to ${input_file_ref} space"
   echo "******************************************************"
+
   flirt -in ${input_file}.nii.gz -ref ${input_file_ref}.nii.gz -applyxfm -init "${matrix}.mat" -out "${output_dir}/${input_file_prefix}_${output_prefix}.nii.gz" -dof 6
+
+  # Threshold the mask afterwards
+  # Based on these instructions: https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FLIRT/FAQ#How_do_I_transform_a_mask_with_FLIRT_from_one_space_to_another.3F
+  fslmaths "${output_dir}/${input_file_prefix}_${output_prefix}.nii.gz" -thr ${mask_thresh} -bin "${output_dir}/${input_file_prefix}_${output_prefix}.nii.gz"
+
 else
    echo "***************************************************************"
    echo "${input_file} already transformed to to ${input_file_ref} space"

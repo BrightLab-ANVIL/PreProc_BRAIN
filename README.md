@@ -1,17 +1,26 @@
 # PreProc_BRAIN
 
-This code is written to be general, and written so you can write some parent code that can loop over subjects or scans and call upon each individual function. 
+This code assumes you have a fMRI file and a T1-weighted file.
+It does minimal pre-processing of the fMRI data (volume registration, brain extraction) and produces tissue masks in fMRI space, and average time-series over these masks.
+This code is written to be general, and written so you can write some parent code that can loop over subjects or scans and call upon each individual function.
 
 Suggested order to run:
 
-1. x.PreProc_VolReg_4D (motion correction on functional dataset)
-2. x.PreProc_BET-4D (brain extraction on functional dataset)
-3. (Optional) x.PreProc_Mask-4D (apply the brain mask made from step 2 to more functional datasets)
-4. x.PreProc_BET-anat (brain extraction on anatomical dataset)
-5. x.PreProc_SEG-anat (tissue segmentation on anatomical dataset)
-6. x.PreProc_TissueReg (register functional and anatomical datasets)
-7. x.PreProc_Transform (transform anatomical to functional space, or vice versa)
+1. First run the command 'fsl_anat' to process your T1-weighted anatomical image. The simplest way to do this is to type this into your terminal:
 
-IMPORTANT: If you transform a mask (zeroes and ones) with x.PreProc_Transform, the mask in the new space will no longer be binary. It needs to be thresholded and binarized again. This is explained in [this issue](https://github.com/BrightLab-ANVIL/PreProc_BRAIN/issues/9)
+fsl_anat -i <structural image> -o <output directory path>
 
-8. x.PreProc_MEANTS (output a mean time-series from the functional dataset, masked by some anatomy)
+Your <structural image> should be your T1-weighted image that has NOT been brain extracted.
+Running the command as above will runs with all the defaults settings and give you ALL the outputs.
+Many of the outputs are useful so if you don't have space limitations you might as well generate them all.  
+See here for details: https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/fsl_anat
+
+In order to run steps (5) and (6) you will need to threshold and binarize the partial volume image of the tissue class of interest:
+
+e.g.
+
+2. x.PreProc_VolReg_4D (motion correction on functional dataset)
+3. x.PreProc_BET-4D (brain extraction on functional dataset) OR x.PreProc_Mask-4D (apply the brain mask made from running x.PreProc_BET-4D on a different functional scan in the same space)
+4. x.PreProc_TissueReg (register functional and anatomical datasets)
+5. x.PreProc_Transform_MASK (transform tissue masks - generated from fsl_anat - from anatomical to functional space).
+6. x.PreProc_MEANTS (output a mean time-series from the functional dataset, masked by a tissue mask)

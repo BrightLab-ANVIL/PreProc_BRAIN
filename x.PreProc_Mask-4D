@@ -54,7 +54,7 @@ then
   echo "Appling mask to ${input_prefix}.nii.gz"
   echo "*************************************"
 
-  3dcalc -a ${input_file}.nii.gz -b ${mask_file}.nii.gz \
+  3dcalc -a ${input_file}.nii.gz -b ${mask_file}.nii.gz[0] \
   -expr "a*b" -prefix ${output_dir}/${input_prefix}_brain.nii.gz
 
 else
