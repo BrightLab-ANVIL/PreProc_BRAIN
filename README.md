@@ -11,13 +11,11 @@ Suggested order to run:
 fsl_anat -i _structural-image_ -o _output-directory-path_
 
 Your structural image should be your T1-weighted image that has NOT been brain extracted.
-Running the command as above will runs with all the defaults settings and give you ALL the outputs.
+Running the command as above will run with all the defaults settings and give you ALL the outputs.
 Many of the outputs are useful so if you don't have space limitations you might as well generate them all.  
 See here for details: https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/fsl_anat
 
 In order to run steps (5) and (6) you will need to threshold and binarize the partial volume image of the tissue class of interest:
-
-e.g.
 
 2. x.PreProc_VolReg_4D (motion correction on functional dataset)
 3. x.PreProc_BET-4D (brain extraction on functional dataset) OR x.PreProc_Mask-4D (apply the brain mask made from running x.PreProc_BET-4D on a different functional scan in the same space)
