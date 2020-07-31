@@ -1,0 +1,76 @@
+#!/bin/sh
+
+# An example of how to RUN these functions together and across subjects
+# Try to just change this file and not the functions that it calls
+
+#####################################
+# Chose analysis options below (1=run)
+#####################################
+DO_fsl_anat=0
+DO_PreProc_VolReg_4D=0
+DO_PreProc_BET_4D=0
+DO_PreProc_Mask_4D=0
+DO_PreProc_TissueReg=0
+DO_PreProc_Transform_MASK=0
+DO_PreProc_MEANTS=0
+
+parent_dir='/Users/xxxxx/Documents/CODE/PreProc_Brain/testing' #change this!
+
+################################
+################################
+################################
+
+for subject in sub-01 #sub-02
+do
+
+echo "*********************"
+echo "Processing ${subject}"
+echo "*********************"
+
+########################
+###### fsl_anat ########
+########################
+
+if [ "${DO_fsl_anat}" -eq 1 ]
+
+then
+  echo "****************"
+  echo "Running fsl_anat"
+  echo "****************"
+
+  fsl_anat -i ${parent_dir}/test_data/${subject}_T1w.nii.gz -o ${parent_dir}/test_output
+
+else
+  echo "********************"
+  echo "Not running fsl_anat"
+  echo "********************"
+fi
+
+# threshold and binarize the partial volume image of the tissue class of interest
+
+###################################
+###### x.PreProc_VolReg_4D ########
+###################################
+
+if [ "${DO_PreProc_VolReg_4D}" -eq 1 ]
+
+then
+  echo "****************************"
+  echo "Running x.PreProc_VolReg-4D"
+  echo "****************************"
+
+  ./x.PreProc_VolReg-4D "${parent_dir}/test_data/${subject}_task-BH_acq-mb4_bold" "${parent_dir}/test_data/${subject}_task-BH_acq-mb4_bold_SBRef" 0 ${parent_dir}/test_output y
+
+else
+  echo "*******************************"
+  echo "Not running x.PreProc_VolReg-4D"
+  echo "*******************************"
+fi
+
+###################################
+########## NEXT FUNCTION ##########
+###################################
+
+# code
+
+done #end subject loop
