@@ -12,7 +12,7 @@ then
     echo "Input 3 should be the full path to the transformation matrix*"
     echo "Input 4 should be the mask threshold (0.5 is suggested)."
     echo "See here for details: https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FLIRT/FAQ#How_do_I_transform_a_mask_with_FLIRT_from_one_space_to_another.3F"
-    echo "Input 5 should be the full path the output directory"
+    echo "Input 5 should be the full path to the output directory"
     echo "Input 6 should be output label e.g. lowres or fMRIspace or T1toFunc"
     echo "*Note: do not include file extension - assumes nii.gz and .mat"
     echo "********************************************************************************************************"
