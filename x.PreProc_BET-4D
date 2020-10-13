@@ -56,8 +56,9 @@ then
   echo "**************************************************"
   echo "Eroding edges from ${input_prefix}_bet.nii.gz"
   echo "**************************************************"
-  fslmaths "${output_dir}/${input_prefix}_bet.nii.gz" -ero "${output_dir}/${input_prefix}_bet_ero.nii.gz"
-  fslmaths "${output_dir}/${input_prefix}_bet.nii.gz" -bin "${output_dir}/${input_prefix}_bet_ero_mask.nii.gz"
+  fslmaths "${output_dir}/${input_prefix}_bet_mask.nii.gz" -ero "${output_dir}/${input_prefix}_bet_mask_ero.nii.gz"
+  3dcalc -a "${output_dir}/${input_prefix}_bet.nii.gz" -b "${output_dir}/${input_prefix}_bet_mask_ero.nii.gz" -expr "a*b" -prefix "${output_dir}/${input_prefix}_bet_ero.nii.gz"
+
 
 else
   echo "**********************************************************"
