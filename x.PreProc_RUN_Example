@@ -14,7 +14,7 @@ DO_PreProc_TissueReg=0
 DO_PreProc_Transform_MASK=0
 DO_PreProc_MEANTS=0
 
-parent_dir='/Users/xxxxx/Documents/CODE/PreProc_Brain/testing' #change this!
+parent_dir='/Users/XXXX/Documents/GitHub/PreProc_BRAIN/TEST' #change this!
 
 ################################
 ################################
@@ -39,6 +39,8 @@ then
   echo "****************"
 
   fsl_anat -i ${parent_dir}/test_data/${subject}_T1w.nii.gz -o ${parent_dir}/test_output
+  # Running it like this uses all the defaults - if you don't use many of the outputs it generates, consider changing the defaults
+  # An alternative to fsl_anat: if you only want brain extraction and tissue segmentation on the T1w file -  run FSL 'bet' and 'fast' commands, respectively.
 
 else
   echo "********************"
@@ -46,7 +48,9 @@ else
   echo "********************"
 fi
 
-# threshold and binarize the partial volume image of the tissue class of interest
+# Threshold and binarize the partial volume image of the tissue class of interest
+# e.g. fslmaths output.anat/T1_fast_pve_1.nii.gz -thr 0.5 -bin output.anat/GM_mask_p5.nii.gz (or use AFNI's 3dcalc)
+# You'll need this for x.PreProc_Transform and x.PreProc_MEANTS
 
 ###################################
 ###### x.PreProc_VolReg_4D ########
