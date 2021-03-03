@@ -40,7 +40,7 @@ then
 
   fsl_anat -i ${parent_dir}/test_data/${subject}_T1w.nii.gz -o ${parent_dir}/test_output
   # Running it like this uses all the defaults - if you don't use many of the outputs it generates, consider changing the defaults
-  # An alternative to fsl_anat: if you only want brain extraction and tissue segmentation on the T1w file -  run FSL 'bet' and 'fast' commands, respectively.
+  # An alternative to fsl_anat: if you only want brain extraction and tissue segmentation on the T1w file - see x.PreProc_BET-anat and x.PreProc_SEG-anat
 
 else
   echo "********************"

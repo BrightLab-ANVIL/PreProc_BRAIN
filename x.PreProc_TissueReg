@@ -1,7 +1,7 @@
 #!/bin/sh
 # x.PreProc_TissueReg
 
-# Registers an anatomically weighted image (i.e T1) to a 4D image
+# Registers an anatomically weighted image (i.e T1) to functional space
 # Both images should be brain extracted
 # Linear, 6 dof
 
@@ -9,7 +9,8 @@ if [ $# -ne 4 ]
 then
     echo "********************************************************************************************************"
     echo "Insufficient arguments supplied"
-    echo "Input 1 should be the full path to the 4D input scan* "
+    echo "Input 1 should be the full path to the functional reference volume*"
+    echo "e.g. whatever ref volume you used when running 3dvolreg e.g. SBRef or first volume of functional scan"
     echo "Input 2 should be the full path to the anat input scan* "
     echo "Input 3 should be the full path to the output directory "
     echo "Input 4 should be the subject ID"
@@ -19,19 +20,19 @@ then
 fi
 
 #define inputs
-input_file_4D=${1}
+input_file_func=${1}
 input_file_anat=${2}
 output_dir=${3}
 subject=${4}
 
 #Check the input files exist
 echo "*******************************************************"
-echo "Input files are ${input_file_4D} and ${input_file_anat}"
+echo "Input files are ${input_file_func} and ${input_file_anat}"
 echo "*******************************************************"
-if [ ! -f "${input_file_4D}.nii.gz" ]
+if [ ! -f "${input_file_func}.nii.gz" ]
 then
   echo "***************************************************"
-  echo "Cannot locate the NIFTI input file ${input_file_4D}"
+  echo "Cannot locate the NIFTI input file ${input_file_func}"
   echo "...exiting!"
   echo "***************************************************"
   exit
@@ -56,23 +57,23 @@ echo "Output directory is ${output_dir}"
 echo "********************************"
 
 
-#Registration from 4D-func to anat
+#Registration from func to anat
 
-if [ ! -f ${output_dir}/${subject}_anat_to_4D.mat ]
+if [ ! -f ${output_dir}/${subject}_anat_to_func.mat ]
 then
 
   echo "*****************************************************************"
-  echo "Registering ${input_file_4D} to ${input_file_anat} with FSL FLIRT"
+  echo "Registering ${input_file_func} to ${input_file_anat} with FSL FLIRT"
   echo "*****************************************************************"
-  flirt -in ${input_file_4D}.nii.gz -ref ${input_file_anat}.nii.gz -omat ${output_dir}/${subject}_4D_to_anat.mat -dof 6
+  flirt -in ${input_file_func}.nii.gz -ref ${input_file_anat}.nii.gz -omat ${output_dir}/${subject}_func_to_anat.mat -dof 6
 
   echo "*******************************"
   echo "Inverting transformation matrix"
   echo "*******************************"
-  convert_xfm -omat ${output_dir}/${subject}_anat_to_4D.mat -inverse ${output_dir}/${subject}_4D_to_anat.mat
+  convert_xfm -omat ${output_dir}/${subject}_anat_to_func.mat -inverse ${output_dir}/${subject}_func_to_anat.mat
 
 else
  echo "**************************************************************************"
- echo "Registration from ${input_file_4D} to ${input_file_anat} already completed"
+ echo "Registration from ${input_file_func} to ${input_file_anat} already completed"
  echo "**************************************************************************"
 fi
