@@ -13,16 +13,15 @@ fsl_anat -i _structural-image_ -o _output-directory-path_
 
 Your structural image should be your T1-weighted image that has NOT been brain extracted.
 Running the command as above will run with all the defaults settings and give you ALL the outputs.
-Many of the outputs are useful so if you don't have space limitations you might as well generate them all.  
+Many of the outputs are useful so if you don't have space or time limitations you might as well generate them all.  
 See here for details: https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/fsl_anat
-See 'x.PreProc_RUN_Example' for alternatives.
+An alternative to fsl_anat: if you only want brain extraction and tissue segmentation on the T1w file - see x.PreProc_BET-anat and x.PreProc_SEG-anat
 
 2. x.PreProc_VolReg_4D (motion correction on functional dataset)
 3. x.PreProc_BET-4D (brain extraction on functional dataset) OR x.PreProc_Mask-4D (apply the brain mask made from running x.PreProc_BET-4D on a different functional scan in the same space)
 4. x.PreProc_TissueReg (register functional and anatomical datasets)
 
-In order to run steps (5) and (6) you will need to threshold and binarize the partial volume image of the tissue class of interest.
-See the x.PreProc_RUN_Example for more options.
+In order to run steps (5) and (6) you will need to threshold and binarize the partial volume image of the tissue class of interest.See the x.PreProc_RUN_Example for more options.
 
 5. x.PreProc_Transform (transform file in T1 space, e.g. tissue masks generated from fsl_anat, to functional space).
 6. x.PreProc_MEANTS (output a mean time-series from the functional dataset, masked by a tissue mask)
