@@ -54,9 +54,10 @@ fi
 if [ ! -f ${output_dir}/${anat_prefix}_bet.nii.gz ]
 then
 
-  echo "**********************************************"
+  echo "*****************************************************************"
   echo "Running brain extraction on the ${anat_prefix}"
-  echo "**********************************************"
+  echo "Always check the ouput! FSL-BET settings may need to be optimized"
+  echo "*****************************************************************"
   bet "${input_file}.nii.gz" ${output_dir}/${anat_prefix}_bet -m  -R
 
 else

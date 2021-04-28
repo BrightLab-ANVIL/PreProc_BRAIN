@@ -25,7 +25,7 @@ output_dir=${4}
 quad_deriv=${5}
 
 #Check input 5 to output motion derivatives and quadratic terms
-if [ ${quad_deriv} != y ] && [ ${quad_deriv} != n ]; then
+if [ ${quad_deriv} != 0 ] && [ ${quad_deriv} != 1 ]; then
   echo "*****************************"
   echo "Input 5 is unknown... exiting"
   echo "*****************************"

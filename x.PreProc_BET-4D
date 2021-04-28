@@ -47,9 +47,10 @@ input_prefix="$(basename -- $input_file)"
 if [ ! -f "${output_dir}/${input_prefix}_bet.nii.gz" ]
 then
 
-  echo "**************************************************"
+  echo "*****************************************************************"
   echo "Running brain extraction on ${input_prefix}.nii.gz"
-  echo "**************************************************"
+  echo "Always check the ouput! FSL-BET settings may need to be optimized"
+  echo "*****************************************************************"
   bet "${input_file}.nii.gz" "${output_dir}/${input_prefix}_bet.nii.gz" -m -F
 
   #erode edges for a more conservative brain mask
