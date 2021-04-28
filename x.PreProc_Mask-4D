@@ -2,7 +2,7 @@
 # x.PreProc_Mask-4D
 
 # Applies a mask to an image
-# This is useful if you want to run BET on one image and apply the brain mask to other images.
+# This is useful if you want to run BET on one image and apply the mask to other images in the same space.
 
 if [ $# -ne 3 ]
 then
