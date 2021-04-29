@@ -1,0 +1,9 @@
+0 -1 0 0.0576811
+0 1 0 0.0576811
+
+# delete this line and the lines below before using this file
+# this text file is an example of what is needed for input 4 of the x.PreProc_DistortCorrect function.
+# the first three columns tell us about phase-encode direction and the fourth column is readout time - check the json file for this information and change accordingly.
+# in this example, the first line is referring to a file with AP phase encoding and a total readout time of 0.0576811 seconds. The second line is referring to a file with PA phase encoding and the same readout time.
+# https://mrtrix.readthedocs.io/en/latest/concepts/pe_scheme.html
+# https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/topup/TopupUsersGuide#A--datain
