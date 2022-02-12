@@ -1,0 +1,76 @@
+#!/bin/sh
+
+# A starting template of how to RUN these functions together and across subjects
+# Copy this RUN file into your project directory. Then just change this file, not the specific functions.
+
+#####################################
+# Chose analysis options below (1=run)
+#####################################
+DO_PreProc_BET_anat=0
+DO_PreProc_SEG_anat=0
+DO_PreProc_VolReg_4D=0
+DO_PreProc_DistortCorrect=0
+DO_PreProc_BET_4D=0
+DO_PreProc_Mask_4D=0
+DO_PreProc_TissueReg=0
+DO_PreProc_Transform_MASK=0
+DO_PreProc_MEANTS=0
+
+code_dir='/Users/XXXX/Documents/GitHub/PreProc_BRAIN' #change this to where the PreProc_BRAIN repo is on your computer
+
+################################
+################################
+################################
+
+for subject in sub-01 sub-02
+do
+
+echo "*********************"
+echo "Processing ${subject}"
+echo "*********************"
+
+##################################
+###### x.PreProc_BET_anat ########
+##################################
+
+if [ "${DO_PreProc_BET_anat}" -eq 1 ]
+
+then
+  echo "*****************************************"
+  echo "Running x.PreProc_BET_anat for ${subject}"
+  echo "*****************************************"
+
+  ${code_dir}/x.PreProc_BET-anat /path_to_T1_input_file /path_to_output_dir
+
+else
+  echo "*********************************************"
+  echo "Not running x.PreProc_BET_anat for ${subject}"
+  echo "*********************************************"
+fi
+
+##################################
+###### x.PreProc_SEG_anat ########
+##################################
+
+if [ "${DO_PreProc_SEG_anat}" -eq 1 ]
+
+then
+  echo "*****************************************"
+  echo "Running x.PreProc_SEG_anat for ${subject}"
+  echo "*****************************************"
+
+  ${code_dir}/x.PreProc_SEG-anat /path_to_T1_input_file /path_to_output_dir partial_volume_threshold
+
+else
+  echo "*********************************************"
+  echo "Not running x.PreProc_SEG_anat for ${subject}"
+  echo "*********************************************"
+fi
+
+###################################
+########## NEXT FUNCTION ##########
+###################################
+
+# code
+
+done #end subject loop

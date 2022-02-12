@@ -47,7 +47,7 @@ echo "*********************************"
 anat_prefix="$(basename -- $input_file)"
 
 #Run FAST segmentation
-if [ ! -f ${output_dir}/${anat_prefix}_pve_1.nii.gz ]
+if [ ! -f ${output_dir}/${anat_prefix}_pve_1.nii.gz ] #just checking one file
 then
 
   echo "***********************************************"
