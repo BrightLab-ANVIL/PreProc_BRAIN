@@ -4,6 +4,10 @@
 
 # Makes a field map based on two input volumes with different phase encode directions, and then uses this to perform distortion correction on a 4D BOLD-EPI file.
 
+# THIS CODE USES GE-EPI DATA NOT SE-EPI DATA TO MAKE THE FIELDMAPS. IS THIS VALID? 
+# IT SEEMS TO WORK (see the video 'DistortCorrect_singleTE_GE-bold.mov' in this repo for example output) 
+# BUT FSL TOP-UP MAY ASSUME SE-EPI NOT GE-EPI AND THE SIGNAL LOSS IN GE-EPI MAY BE AN ISSUE? 
+
 # There are lots of ways to make field maps and perform distortion correction, please check this function is appropriate for your data!
 # This function was written based on acquiring two scans:
 # [1] - A 4D BOLD EPI multi-band scan with AP phase encoding which also outputs a Single Band Reference Image (SBRef) volume. Your scan of interest!
@@ -12,6 +16,7 @@
 # The SBRef volume for scan [1] is used as the reference (base) volume in the x.PreProc_VolReg-4D function, to correct for motion.
 # The SBRef volumes from scan [1] and scan [2] are used to make the field map.
 # This field map can then be used to correct geometric distortions in the 4D BOLD EPI multi-band scan [1].
+#
 # Some resources:
 # https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/topup/TopupUsersGuide
 # https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/topup/ApplyTopupUsersGuide
