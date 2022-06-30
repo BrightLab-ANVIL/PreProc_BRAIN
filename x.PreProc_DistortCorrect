@@ -4,22 +4,22 @@
 
 # Makes a field map based on two input volumes with different phase encode directions, and then uses this to perform distortion correction on a 4D BOLD-EPI file.
 
-# THIS CODE USES GE-EPI DATA NOT SE-EPI DATA TO MAKE THE FIELDMAPS. IS THIS VALID? 
-# IT SEEMS TO WORK (see the video 'DistortCorrect_singleTE_GE-bold.mov' in this repo for example output) 
-# BUT FSL TOP-UP MAY ASSUME SE-EPI NOT GE-EPI AND THE SIGNAL LOSS IN GE-EPI MAY BE AN ISSUE? 
+# Some resources:
+# https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/topup/TopupUsersGuide
+# https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/topup/ApplyTopupUsersGuide
+# Typically. this FSL pipeline seems to be written for SE-EPI data, we have GE-EPI data with more signal loss
+# This paper suggests that it is still valid with GE-EPI: https://www.frontiersin.org/articles/10.3389/fnins.2021.642808/full
+# It seems to work, see the video 'DistortCorrect_singleTE_GE-bold.mov' in this repo for example output)
 
 # There are lots of ways to make field maps and perform distortion correction, please check this function is appropriate for your data!
 # This function was written based on acquiring two scans:
 # [1] - A 4D BOLD EPI multi-band scan with AP phase encoding which also outputs a Single Band Reference Image (SBRef) volume. Your scan of interest!
 # [2] - A scan with identical parameters as [1] but just a single volume & with PA phase encoding -  this also outputs a SBRef volume.
-# Scan [2] was acquired just before scan [1], as close as possible in time. 
+# Scan [2] was acquired just before scan [1], as close as possible in time.
 # The SBRef volume for scan [1] is used as the reference (base) volume in the x.PreProc_VolReg-4D function, to correct for motion.
 # The SBRef volumes from scan [1] and scan [2] are used to make the field map.
 # This field map can then be used to correct geometric distortions in the 4D BOLD EPI multi-band scan [1].
-#
-# Some resources:
-# https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/topup/TopupUsersGuide
-# https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/topup/ApplyTopupUsersGuide
+
 
 if [ $# -ne 5 ]
 then

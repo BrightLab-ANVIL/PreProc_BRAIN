@@ -12,7 +12,7 @@ Suggested order to run:
 2. x.PreProc_SEG-anat (tissue segmentation on anatomical dataset)
 (An alternative to 1 and 2 would be to run fsl_anat which has further features)
 3. x.PreProc_VolReg_4D (motion correction on functional dataset)
-4. x.PreProc_DistortCorrect (make field map and perform distrotion correction) **Think about whether it makes sense to do this as step 4 in your dataset. Also see [this relevant issue.](https://github.com/BrightLab-ANVIL/PreProc_BRAIN/issues/20)**
+4. x.PreProc_DistortCorrect (make field map and perform distrotion correction) **Think about whether it makes sense to do this as step 4 in your dataset. It may depend on what inputs you use and what your reference is for VolReg_4D**
 6. x.PreProc_BET-4D (brain extraction on functional dataset) OR x.PreProc_Mask-4D (apply the brain mask made from running x.PreProc_BET-4D on a different functional scan in the same space)
 7. x.PreProc_TissueReg (register functional and anatomical datasets)
 8. x.PreProc_Transform (transform file in T1 space, e.g. tissue masks generated from x.PreProc_SEG-anat, to functional space).
