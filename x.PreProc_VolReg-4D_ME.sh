@@ -105,20 +105,20 @@ then
     echo "Making derivative and quadratic motion regressors"
     echo "*************************************************"
     # Output temporal derivatives of motion regressor
-    1d_tool.py -infile ${output_dir}/${input_prefix}_mc.1D[1..6] \
-    -derivative -write ${output_dir}/${input_prefix}_mc_deriv.1D
+    1d_tool.py -infile ${output_dir}/${input_prefix}_1_mc.1D[1..6] \
+    -derivative -write ${output_dir}/${input_prefix}_1_mc_deriv.1D
     # Output quadratics (squared) of motion regressor
-    1dcat `1deval -1D: -a ${output_dir}/${input_prefix}_mc.1D[1] -expr 'a*a'` \
-    `1deval -1D: -a ${output_dir}/${input_prefix}_mc.1D[2] -expr 'a*a'` \
-    `1deval -1D: -a ${output_dir}/${input_prefix}_mc.1D[3] -expr 'a*a'` \
-    `1deval -1D: -a ${output_dir}/${input_prefix}_mc.1D[4] -expr 'a*a'` \
-    `1deval -1D: -a ${output_dir}/${input_prefix}_mc.1D[5] -expr 'a*a'` \
-    `1deval -1D: -a ${output_dir}/${input_prefix}_mc.1D[6] -expr 'a*a'` > ${output_dir}/${input_prefix}_mc_quad.1D
+    1dcat `1deval -1D: -a ${output_dir}/${input_prefix}_1_mc.1D[1] -expr 'a*a'` \
+    `1deval -1D: -a ${output_dir}/${input_prefix}_1_mc.1D[2]  -expr 'a*a'` \
+    `1deval -1D: -a ${output_dir}/${input_prefix}_1_mc.1D[3] -expr 'a*a'` \
+    `1deval -1D: -a ${output_dir}/${input_prefix}_1_mc.1D[4] -expr 'a*a'` \
+    `1deval -1D: -a ${output_dir}/${input_prefix}_1_mc.1D[5] -expr 'a*a'` \
+    `1deval -1D: -a ${output_dir}/${input_prefix}_1_mc.1D[6] -expr 'a*a'` > ${output_dir}/${input_prefix}_1_mc_quad.1D
     # Demean the derivative and quadratic motion regressor
-    1d_tool.py -infile ${output_dir}/${input_prefix}_mc_deriv.1D \
-    -demean -write ${output_dir}/${input_prefix}_mc_deriv_demean.1D
-    1d_tool.py -infile ${output_dir}/${input_prefix}_mc_quad.1D \
-    -demean -write ${output_dir}/${input_prefix}_mc_quad_demean.1D
+    1d_tool.py -infile ${output_dir}/${input_prefix}_1_mc_deriv.1D \
+    -demean -write ${output_dir}/${input_prefix}_1_mc_deriv_demean.1D
+    1d_tool.py -infile ${output_dir}/${input_prefix}_1_mc_quad.1D \
+    -demean -write ${output_dir}/${input_prefix}_1_mc_quad_demean.1D
   fi
 
   # Use motion parameters from echo 1 to motion correct the other echoes
