@@ -5,7 +5,7 @@
 # Outputs are transformation matrices for anat2stand, stand2anat, func2stand, and stand2func
 # Uses FNIRT in FSL (nonlinear)
 # Must have already run x.PreProc_TissueReg_func2anat.sh to get func2anat transformation matrix
-# Currently works only for MNI space. To use with a different standard, will have to find a different --config file to use with FNIRT
+# Currently works only for 2mm MNI space. To use with a different standard, will have to find a different --config file to use with FNIRT
 
 if [ $# -ne 8 ]
 then
