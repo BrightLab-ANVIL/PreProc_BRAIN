@@ -1,17 +1,17 @@
 #!/bin/sh
-# x.PreProc_Transform
+# x.PreProc_Transform_lin.sh
 
-# Transform a file (e.g. a tissue mask) from T1-space to functional space (linear, 6 dof)
+# Transform a file (e.g. a tissue mask) from T1-space to functional space or vice versa (linear, 6 dof)
 
 if [ $# -ne 5 ]
 then
     echo "********************************************************************************************************"
     echo "Insufficient arguments supplied"
-    echo "Input 1 should be the full path to the file in T1 space* "
-    echo "Input 2 should be the full path to ref file in fMRI space* "
-    echo "Input 3 should be the full path to the transformation matrix*"
+    echo "Input 1 should be the full path to the file to be transformed"
+    echo "Input 2 should be the full path to reference file"
+    echo "Input 3 should be the full path to the transformation matrix"
     echo "Input 4 should be the full path to the output directory"
-    echo "Input 5 should be output label e.g. lowres or fMRIspace or T1toFunc"
+    echo "Input 5 should be output label e.g. lowres or fMRIspace or anat2func"
     echo "*Note: do not include file extension - assumes nii.gz and .mat"
     echo "********************************************************************************************************"
     exit
@@ -66,7 +66,6 @@ echo "********************************"
 
 #Get the input filename without the path
 input_file_prefix="$(basename -- $input_file)"
-mat_file_prefix="$(basename -- $matrix)"
 
 #Transformation
 if [ ! -f "${output_dir}/${input_file_prefix}_${output_prefix}.nii.gz" ]
