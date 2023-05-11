@@ -61,11 +61,11 @@ then
   echo "*****************************************************************"
   bet "${input_file}.nii.gz" ${output_dir}/${anat_prefix}_bet -m  -R
   
-  ##################################################
-  ###### Past successful flag combinations #########
+  #########################################
+  ### Past successful flag combinations ###
   # User-Dataset-Datatype: [flags]
   # MCW-NeilsenBrainBH-SBREF: -m -R -f 0.4 -g -0.2
-  ##################################################
+  #########################################
 
 else
   echo "***************************************************"
