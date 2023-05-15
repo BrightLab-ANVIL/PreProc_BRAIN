@@ -67,6 +67,12 @@ then
   # User-Dataset-Datatype: [flags]
   # MCW-NeilsenBrainBH-SBREF: -m -R -f 0.4 -g -0.2
   #########################################
+  
+  #Open up an FSLeyes window with the BET mask and original file for user inspection
+  ORIG_path="${output_dir}/${anat_prefix}_ORIG.nii.gz"
+  mask_path="${output_dir}/${anat_prefix}_bet_mask.nii.gz"
+
+  fsleyes ${ORIG_path} ${mask_path} -cm red -a 40 &
 
 else
   echo "***************************************************"
