@@ -1,15 +1,17 @@
 #!/bin/sh
-# x.PreProc_BET-anat
+# x.PreProc_BET-3D
 
-# Performs brain extraction on an anatomically weighted 3D dataset (i.e T1-w)
-# Check the output before proceeding to later analysis steps (e.g. x.PreProc_SEG-anat and x.PreProc_TissueReg)
-# If the brain extraction is poor, re-run BET with different inputs
+# Performs brain extraction on a 3D dataset (e.g. anatomical T1-weighted 3D dataset or SBREF image of an fMRI dataset)
+# READ ME! IMPORTANT: Check the output and adjust the BET flags in this script (line 62) to ensure good brain extraction before proceeding to later analysis steps 
+# If the brain extraction is poor, re-run BET with different flags
+# See the following for info on BET flags: https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/BET/UserGuide
+# You can find examples of previously successful BET flag combinations on line 65
 
 if [ $# -ne 2 ]
 then
     echo "**************************************************************************************"
     echo "Insufficient arguments supplied"
-    echo "Input 1 should be the full path to the T1 input file (no file extension - assumes nii.gz)"
+    echo "Input 1 should be the full path to the 3D input file (no file extension - assumes nii.gz)"
     echo "Input 2 should be the full path to the output directory"
     echo "**************************************************************************************"
     exit
@@ -59,6 +61,18 @@ then
   echo "Always check the ouput! FSL-BET settings may need to be optimized"
   echo "*****************************************************************"
   bet "${input_file}.nii.gz" ${output_dir}/${anat_prefix}_bet -m  -R
+  
+  #########################################
+  ### Past successful flag combinations ###
+  # User-Dataset-Datatype: [flags]
+  # MCW-NeilsenBrainBH-SBREF: -m -R -f 0.4 -g -0.2
+  #########################################
+  
+  #Open up an FSLeyes window with the BET mask and original file for user inspection
+  ORIG_path="${output_dir}/${anat_prefix}_ORIG.nii.gz"
+  mask_path="${output_dir}/${anat_prefix}_bet_mask.nii.gz"
+
+  fsleyes ${ORIG_path} ${mask_path} -cm red -a 40 &
 
 else
   echo "***************************************************"

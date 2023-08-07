@@ -6,7 +6,7 @@
 #####################################
 # Chose analysis options below (1=run)
 #####################################
-DO_PreProc_BET_anat=0
+DO_PreProc_BET_3D=0
 DO_PreProc_SEG_anat=0
 DO_PreProc_VolReg_4D=0
 DO_PreProc_DistortCorrect=0
@@ -30,17 +30,17 @@ echo "Processing ${subject}"
 echo "*********************"
 
 ##################################
-###### x.PreProc_BET_anat ########
+###### x.PreProc_BET_3D ########
 ##################################
 
-if [ "${DO_PreProc_BET_anat}" -eq 1 ]
+if [ "${DO_PreProc_BET_3D}" -eq 1 ]
 
 then
   echo "*****************************************"
-  echo "Running x.PreProc_BET_anat for ${subject}"
+  echo "Running x.PreProc_BET_3D for ${subject}"
   echo "*****************************************"
 
-  ${code_dir}/x.PreProc_BET-anat /path_to_T1_input_file /path_to_output_dir
+  ${code_dir}/x.PreProc_BET-3D /path_to_T1_input_file /path_to_output_dir
 
 else
   echo "*********************************************"
