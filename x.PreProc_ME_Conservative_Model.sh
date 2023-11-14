@@ -1,11 +1,17 @@
 #!/bin/sh
 # x.PreProc_ME_Conservative_Model.sh
 
-#Orthogonalizes ME-ICA rejected components with respect to the PETCO2hrf trace, the ME-ICA accepted components, motion parameters, and Legendre polynomials (as described in "ICA-based denoising strategies in breath-hold induced cerebrovascular reactivity mapping with multi echo BOLD fMRI")
+# Orthogonalizes ME-ICA rejected components with respect to the PETCO2hrf trace, the ME-ICA accepted components, motion parameters, and Legendre polynomials (as described in "ICA-based denoising strategies in breath-hold induced cerebrovascular reactivity mapping with multi echo BOLD fMRI")
 
-#Prior to using this script, you should have ran the tedana command and used the outputs of this command in Rica (https://rica-fmri.netlify.app/) to manually accept and reject ICA components
-#Rules for classifying ICA components on SharePoint: https://nuwildcat.sharepoint.com/:w:/r/sites/FSM-ANVIL/Shared%20Documents/ResourcesGuides/Multi-echo%20ICA%20classification%20rules.docx?d=w2b995b3b0a02463e8198c511bfb3dc7f&csf=1&web=1&e=FjLGmD
-#After running this script, you can use your orthogonalized rejected components as regressors in your GLM for denoising
+# Prior to using this script, you should have...
+# 1 - Ran the tedana command and used the outputs of this command in Rica (https://rica-fmri.netlify.app/) to manually accept and reject ICA components
+#     Rules for classifying ICA components on SharePoint: https://nuwildcat.sharepoint.com/:w:/r/sites/FSM-ANVIL/Shared%20Documents/ResourcesGuides/Multi-echo%20ICA%20classification%20rules.docx?d=w2b995b3b0a02463e8198c511bfb3dc7f&csf=1&web=1&e=FjLGmD
+
+# 2 - Trimmed the same number of volumes from the start of PETCO2hrf regressor as you did from the fMRI data.
+
+# After running this script, you can use your orthogonalized rejected components as regressors in your GLM for denoising.
+# The output "rejected_ort.1D" contains the components in columns.
+
 
 if [ $# -ne 8 ]
 then
@@ -15,8 +21,16 @@ then
   echo "Input 2 should be the full path to the manual_classification.tsv file (include file extension)"
   echo "Input 3 should be the full path to the demeaned PETCO2 trace convolved with the HRF (do not include file extension - assumes .txt)"
   echo "Input 4 should be the number of extra TRs added before and after the scan (assumes equal # added before and after)."
+  echo ""         
   echo "        For example, if 20 TRs were added to both the beginning AND end of the scan (40 extra TRs total), you would enter 20 here."
-  echo "Input 5 should be the original number of TRs in the scan (before extra TR padding)"
+  echo ""
+  echo "Input 5 should be the number of TRs in the scan (before extra TR padding, and accounting for volumes removed from the start.)"
+  echo ""
+  echo "        NOTE: If you trimmed volumes from the start of your fMRI data, then you should have 1) removed the same
+                number of volumes from the start of the PETCO2hrf regressor and 2) the number of TRs should reflect this.
+                For example, if you removed 10 TRs from your fMRI data AND added 20 extra TRs to your PETCO2hrf, you
+                would remove 10 TRs from the start of your PETCO2hrf with extra padding trace. (It works out.)"
+  echo ""  
   echo "Input 6 should be the full path to the demeaned motion parameters (do not include file extension - assumes .1D)"
   echo "Input 7 should be the Legendre polynomial degree"
   echo "Input 8 should be the full path to the output directory"
@@ -69,12 +83,12 @@ printf -v manAccCom '%s,' "${manAccArr[@]}" #separate array by commas instead of
 
 # Convert CO2 file to 1D so you can select appropriate volumes (ignore any extra TRs added before/after)
 1d_tool.py -infile ${CO2}.txt -write ${CO2}.1D
-extraTR=20 # this is also the start volume
-nTR=265 
-last=$((${nTR}+${extraTR}-1)) #python indexing starts at 0
-echo  $last
 
-#Orthogonalize rejected components to accepted components, CO2 trace, motion, and polynomials
+# Calculate last volume number
+last=$((${nTR}+${extraTR}-1)) #python indexing starts at 0
+# Note: extraTR = the first TR since python indexing starts at 0
+
+# Orthogonalize rejected components to accepted components, CO2 trace, motion, and polynomials
 3dTproject -ort acceptedTrans.1D \
 -ort ${CO2}.1D"{$extraTR..$last}" \
 -ort ${motion}.1D \
