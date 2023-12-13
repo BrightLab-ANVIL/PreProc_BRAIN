@@ -51,9 +51,9 @@ output_dir=${8}
 cd ${output_dir}
 
 
-# Find REJECTED component numbers from tedana file
-# Rica code outputs classifications to column 17
-manRej=`cut -f17 ${man_class} | tail -n +2 | grep -n rejected | cut -d : -f1 | tr "\n" " "`
+# Find REJECTED component numbers from tedana file 
+columnNumber=$(awk -F'\t' 'NR==1 {for (i=1; i<=NF; i++) if ($i == "classification") print i; exit}' "${man_class}")
+manRej=`cut -f${columnNumber} ${man_class} | tail -n +2 | grep -n rejected | cut -d : -f1 | tr "\n" " "`
 
 manRejArr=( $manRej ) #change string to array
 for (( i = 0 ; i < ${#manRejArr[@]} ; i++ )) do  (( manRejArr[$i]=${manRejArr[$i]} - 1 )) ; done #subtract 1 from each number to start indexing at 0
