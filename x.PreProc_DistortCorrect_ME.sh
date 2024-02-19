@@ -1,0 +1,129 @@
+#!/bin/sh
+
+# x.PreProc_DistortCorrect_ME.sh
+
+# Makes a field map based on two input volumes with different phase encode directions, and then uses this to perform distortion correction on a 4D BOLD-EPI file.
+
+# Some resources:
+# https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/topup/TopupUsersGuide
+# https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/topup/ApplyTopupUsersGuide
+# Typically. this FSL pipeline seems to be written for SE-EPI data, we have GE-EPI data with more signal loss
+# This paper suggests that it is still valid with GE-EPI: https://www.frontiersin.org/articles/10.3389/fnins.2021.642808/full
+# It seems to work, see the video 'DistortCorrect_singleTE_GE-bold.mov' in this repo for example output)
+
+# There are lots of ways to make field maps and perform distortion correction, please check this function is appropriate for your data!
+# This function was written based on acquiring two scans:
+# [1] - A 4D BOLD EPI multi-band scan with AP phase encoding which also outputs a Single Band Reference Image (SBRef) volume. Your scan of interest!
+# [2] - A scan with identical parameters as [1] but just a single volume & with PA phase encoding -  this also outputs a SBRef volume.
+# Scan [2] was acquired just before scan [1], as close as possible in time.
+# The SBRef volume for scan [1] is used as the reference (base) volume in the x.PreProc_VolReg-4D function, to correct for motion.
+# The SBRef volumes from scan [1] and scan [2] are used to make the field map.
+# This field map can then be used to correct geometric distortions in the 4D BOLD EPI multi-band scan [1].
+
+
+if [ $# -ne 6 ]
+then
+    echo "**************************************************************************************"
+    echo "Insufficient arguments supplied"
+    echo "Input 1 should be the full path to the AP file, used to make the fieldmap"
+    echo "Input 2 should be the full path to the PA file, used to make the fieldmap"
+    echo "Input 3 should be the full path to the 4D-fMRI file (AP) to correct for distortion (w/o echo number suffix)"
+    echo "Input 4 should be the number of echoes collected"
+    echo "Input 5 should be the full path to the text file with PE directions/times (line1: AP, line2: PA)"
+    echo "Input 6 should be the output directory for the fieldmap files e.g. fieldmap_files_sub01"
+    echo "*Do not include file extension - assumes nii.gz for inputs 1-3 and txt for 5*"
+    echo "**************************************************************************************"
+    exit
+fi
+
+#define inputs
+AP_file=${1}
+PA_file=${2}
+File_4D=${3}
+num_echoes=${4}
+topup_file=${5}
+output_dir=${6}
+
+#Check the input files exists
+echo "***********************************"
+echo "Input AP file is ${AP_file}.nii.gz"
+echo "***********************************"
+if [ ! -f "${AP_file}.nii.gz" ]
+then
+  echo "****************************************************"
+  echo "Cannot locate the NIFTI input file ${AP_file}.nii.gz"
+  echo "...exiting!"
+  echo "****************************************************"
+  exit
+fi
+
+echo "Input PA file is ${PA_file}.nii.gz"
+echo "**********************************"
+if [ ! -f "${PA_file}.nii.gz" ]
+then
+  echo "Cannot locate the NIFTI input file ${PA_file}.nii.gz"
+  echo "...exiting!"
+  echo "****************************************************"
+  exit
+fi
+
+echo "Input 4D file is ${File_4D}.nii.gz"
+echo "**********************************"
+if [ ! -f "${File_4D}_1.nii.gz" ]
+then
+  echo "Cannot locate the NIFTI input file ${File_4D}_1.nii.gz"
+  echo "...exiting!"
+  echo "****************************************************"
+  exit
+fi
+
+#If output directory is not present, make it
+if [ ! -d ${output_dir} ]
+then
+  mkdir -p ${output_dir}
+fi
+echo "Output directory is ${output_dir}"
+echo "********************************"
+
+
+# Merge into one file
+if [ ! -f "${output_dir}/AP_PA_merge.nii.gz" ]
+then
+  echo "Merging AP and PA input volumes"
+  echo "*******************************"
+  fslmerge -t ${output_dir}/AP_PA_merge.nii.gz ${AP_file}.nii.gz ${PA_file}.nii.gz
+else
+  echo "AP and PA input volumes already merged"
+  echo "*******************************"
+fi
+
+# Make fieldmap
+if [ ! -f "${output_dir}/my_topup_results_fieldcoef.nii.gz" ] #just checking for the main output
+then
+  echo "Running topup (making fieldmap)"
+  echo "*******************************"
+  topup --imain=${output_dir}/AP_PA_merge.nii.gz --datain=${topup_file}.txt --config=b02b0.cnf --out=${output_dir}/my_topup_results --fout=${output_dir}/my_field --iout=${output_dir}/my_unwarped_image
+else
+  echo "topup already run (fieldmaps already made)"
+  echo "******************************************"
+fi
+
+#Get the input filename without the path
+input_prefix="$(basename -- $File_4D)"
+input_prefix2="$(basename -- $AP_file)"
+
+# Apply field map for distortion correction
+if [ ! -f "${File_4D}_dc_1.nii.gz" ]
+then
+  echo "Applying topup (distortion correction)"
+  echo "**************************************"
+  for echonum in $(eval echo "{1..$num_echoes}")
+  do
+    applytopup --imain=${File_4D}_${echonum}.nii.gz --inindex=1 --topup=${output_dir}/my_topup_results --datain=${topup_file}.txt --out=${output_dir}/${input_prefix}_dc_${echonum}.nii.gz  --method=jac
+  done
+
+  applytopup --imain=${AP_file}.nii.gz --inindex=1 --topup=${output_dir}/my_topup_results --datain=${topup_file}.txt --out=${output_dir}/${input_prefix2}_dc.nii.gz  --method=jac
+else
+  echo "Topup (distortion correction) already completed"
+  echo "***********************************************"
+fi
