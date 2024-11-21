@@ -69,8 +69,7 @@ printf -v manRejCom '%s,' "${manRejArr[@]}" #separate array by commas instead of
 
 
 # Find ACCEPTED component numbers from tedana file
-# Rica code outputs classifications to column 17
-manAcc=`cut -f17 ${man_class} | tail -n +2 | grep -n accepted | cut -d : -f1 | tr "\n" " "`
+manAcc=`cut -f${columnNumber} ${man_class} | tail -n +2 | grep -n accepted | cut -d : -f1 | tr "\n" " "`
 
 manAccArr=( $manAcc ) #change string to array
 for (( i = 0 ; i < ${#manAccArr[@]} ; i++ )) do  (( manAccArr[$i]=${manAccArr[$i]} - 1 )) ; done #subtract 1 from each number to start indexing at 0
