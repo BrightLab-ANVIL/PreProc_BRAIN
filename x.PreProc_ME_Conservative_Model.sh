@@ -1,7 +1,7 @@
 #!/bin/sh
 # x.PreProc_ME_Conservative_Model.sh
 
-# Orthogonalizes ME-ICA rejected components with respect to the PETCO2hrf trace, the ME-ICA accepted components, motion parameters, and Legendre polynomials (as described in "ICA-based denoising strategies in breath-hold induced cerebrovascular reactivity mapping with multi echo BOLD fMRI")
+# Orthogonalizes ME-ICA rejected components with respect to the PETCO2hrf trace, the ME-ICA accepted components, motion parameters and their derivatives, and Legendre polynomials (as described in "ICA-based denoising strategies in breath-hold induced cerebrovascular reactivity mapping with multi echo BOLD fMRI")
 
 # Prior to using this script, you should have...
 # 1 - Ran the tedana command and used the outputs of this command in Rica (https://rica-fmri.netlify.app/) to manually accept and reject ICA components
@@ -13,7 +13,7 @@
 # The output "rejected_ort.1D" contains the components in columns.
 
 
-if [ $# -ne 8 ]
+if [ $# -ne 9 ]
 then
   echo "*****************************************************************************************************"
   echo "Insufficient arguments supplied"
@@ -32,8 +32,9 @@ then
                 would remove 10 TRs from the start of your PETCO2hrf with extra padding trace. (It works out.)"
   echo ""  
   echo "Input 6 should be the full path to the demeaned motion parameters (do not include file extension - assumes .1D)"
-  echo "Input 7 should be the Legendre polynomial degree"
-  echo "Input 8 should be the full path to the output directory"
+  echo "Input 7 should be the full path to the demeaned motion parameter derivatives (do not include file extension - assumes .1D)"
+  echo "Input 8 should be the Legendre polynomial degree"
+  echo "Input 9 should be the full path to the output directory"
   echo "*****************************************************************************************************"
   exit
 fi
@@ -45,8 +46,9 @@ CO2=${3}
 extraTR=${4}
 nTR=${5}
 motion=${6}
-Legendre_degree=${7}
-output_dir=${8}
+Dmotion=${7}
+Legendre_degree=${8}
+output_dir=${9}
 
 cd ${output_dir}
 
@@ -67,8 +69,7 @@ printf -v manRejCom '%s,' "${manRejArr[@]}" #separate array by commas instead of
 
 
 # Find ACCEPTED component numbers from tedana file
-# Rica code outputs classifications to column 17
-manAcc=`cut -f17 ${man_class} | tail -n +2 | grep -n accepted | cut -d : -f1 | tr "\n" " "`
+manAcc=`cut -f${columnNumber} ${man_class} | tail -n +2 | grep -n accepted | cut -d : -f1 | tr "\n" " "`
 
 manAccArr=( $manAcc ) #change string to array
 for (( i = 0 ; i < ${#manAccArr[@]} ; i++ )) do  (( manAccArr[$i]=${manAccArr[$i]} - 1 )) ; done #subtract 1 from each number to start indexing at 0
@@ -88,11 +89,13 @@ printf -v manAccCom '%s,' "${manAccArr[@]}" #separate array by commas instead of
 last=$((${nTR}+${extraTR}-1)) #python indexing starts at 0
 # Note: extraTR = the first TR since python indexing starts at 0
 
-# Orthogonalize rejected components to accepted components, CO2 trace, motion, and polynomials
+# Orthogonalize rejected components to accepted components, CO2 trace, motion, motion derivatives, and polynomials
 3dTproject -ort acceptedTrans.1D \
 -ort ${CO2}.1D"{$extraTR..$last}" \
 -ort ${motion}.1D \
+-ort ${DMotion}.1D \
 -polort ${Legendre_degree}  \
 -prefix rejectedTrans_ort.1D \
 -input rejected.1D
 1dtranspose rejectedTrans_ort.1D > rejected_ort.1D
+
