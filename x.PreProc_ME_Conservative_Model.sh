@@ -12,13 +12,15 @@
 # After running this script, you can use your orthogonalized rejected components as regressors in your GLM for denoising.
 # The output "rejected_ort.1D" contains the components in columns.
 
+# NOTE: If making CVR maps, do not use this script. Instead, use phys2cvr's "-omat" and "-emat" options to ensure that your rejected components are orthogonalized with respect to your SHIFTED PETCO2hrf trace
 
 if [ $# -ne 9 ]
 then
   echo "*****************************************************************************************************"
   echo "Insufficient arguments supplied"
   echo "Input 1 should be the full path to desc-ICA_mixing.tsv file (include file extension)"
-  echo "Input 2 should be the full path to the manual_classification.tsv file (include file extension)"
+  echo "Input 2 should be the full path to the classification file (include file extension). If doing manual classifications, this is called manual_classification.tsv, \
+        and if doing automated classifications, this is called desc-tedana_metrics.tsv"
   echo "Input 3 should be the full path to the demeaned PETCO2 trace convolved with the HRF (do not include file extension - assumes .txt)"
   echo "Input 4 should be the number of extra TRs added before and after the scan (assumes equal # added before and after)."
   echo ""         
